@@ -1,0 +1,105 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Customers {
+  id String @id @default(uuid())
+  company_name String
+  name String
+  mobile String
+  email String
+  bank_details String
+  upi_id String
+  state String
+  country String
+  pincode String
+  orders Orders[]
+}
+
+model Suppliers {
+  id String @id @default(uuid())
+  company_name String
+  name String
+  mobile String
+  email String
+  bank_details String
+  country String
+  pincode String
+  orders Orders[]
+}
+
+model Orders {
+  id String @id @default(uuid())
+  supplier_id String
+  customer_id String
+  purchaseAmount Int
+  sellingAmount Int
+  clearing_rate Int
+  cha_name String
+  transporter String
+  status String
+  shippingLine String
+  material_description String
+  net_weight String
+  gross_weight String
+  currency String
+  vat_rate Int @default(0)
+  order_type String // Direct trade or Indirect Trade
+  shipped_on_date String
+  loaded_on_date String
+  gate_in_date String
+  arrival_date String
+  port_of_loading String
+  port_of_deloading String
+  destination String
+  shippingDocs ShippingDocs[]
+  supplier Suppliers @relation(fields: [supplier_id] , references: [id])
+  customer Customers @relation(fields: [customer_id] , references: [id])
+  outwardPayment OutwardPayment[]
+  inwardPayment InwardPayment[]
+}
+
+model ShippingDocs {
+  id String @id @default(uuid())
+  doc_name String
+  doc_url String
+  order_id String
+  order Orders @relation(fields: [order_id] , references: [id])
+}
+
+model OutwardPayment {
+  id String @id @default(uuid())
+  advance_amount Int
+  balance_amount Int
+  advance_paid Boolean
+  balance_paid Boolean
+  ORTT_DOC_1 String @default("")
+  ORTT_DOC_2 String @default("")
+  order_id String
+  order Orders @relation(fields: [order_id] , references: [id])
+}
+
+model InwardPayment {
+  id String @id @default(uuid())
+  advance_amount Int
+  balance_amount Int
+  advance_paid Boolean
+  balance_paid Boolean
+  proof_of_payment String
+  order_id String
+  order Orders @relation(fields: [order_id] , references: [id])
+}
+
+
+
+
