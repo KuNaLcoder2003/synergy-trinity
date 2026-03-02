@@ -1,7 +1,9 @@
 import mongoose from "mongoose"
+import dotenv from "dotenv"
+dotenv.config()
 import { customerSchema, orderSchema, supplierSchema } from "./models.js"
 
-mongoose.connect('mongodb+srv://kunal:kunal@cluster0.acncl.mongodb.net/')
+mongoose.connect(`${process.env.MONGO_URL}`)
 
 export const Customer = mongoose.model('operations_tool_customers_table', customerSchema)
 export const Supplier = mongoose.model('operations_tool_suppliers_table', supplierSchema)
