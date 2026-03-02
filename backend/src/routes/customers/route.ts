@@ -1,22 +1,11 @@
 import express from "express"
-import prisma from "../../prisma.js";
-type customer = {
-    company_name: string;
-    name: string;
-    mobile: string;
-    email: string;
-    bank_details: string;
-    upi_id: string;
-    state: string;
-    country: string;
-    pincode: string;
-
-}
+import type { Customers } from "../../types.js";
+import { Customer } from "../../mongoose.js";
 const customerRouter = express.Router()
 
 customerRouter.post('/', async (req: express.Request, res: express.Response) => {
     try {
-        const customerDetails: customer = req.body;
+        const customerDetails: Customers = req.body;
         if (!customerDetails) {
             res.status(403).json({
                 message: "Incomplete Supplier details",
@@ -24,23 +13,40 @@ customerRouter.post('/', async (req: express.Request, res: express.Response) => 
             })
             return
         }
-        const response = await prisma.$transaction(async (tx) => {
-            const new_customer = await tx.customers.create({
-                data: customerDetails
-            })
-            return { new_customer }
+
+        const existing = await Customer.find({
+            $or: [
+                {
+                    mobile: customerDetails.mobile
+                }, {
+                    company_name: customerDetails.company_name.toLowerCase()
+                }
+            ]
         })
-        if (!response || !response.new_customer) {
+
+        if (!existing) {
             res.status(403).json({
-                message: "Unable to add new customer",
+                message: "Customer already exists",
                 valid: false
             })
             return
         }
+
+        const new_cutomer = new Customer(customerDetails)
+
+        if (!new_cutomer) {
+            res.status(400).json({
+                message: "Bad request",
+                valid: false
+            })
+            return
+        }
+        await new_cutomer.save()
         res.status(200).json({
-            message: "Successfully Added New Customer",
-            valid: true
+            message: "Successfully added new customer",
+            valid: true,
         })
+
     } catch (error) {
         console.log(error)
         res.status(500).json({

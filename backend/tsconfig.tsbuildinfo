@@ -1,1 +1,1 @@
-{"root":["./src/index.ts","./src/prisma.ts"],"version":"5.9.3"}
+{"root":["./src/firebase.ts","./src/index.ts","./src/prisma.ts","./src/functions/cloud.ts","./src/routes/index.ts","./src/routes/clients/route.ts","./src/routes/company/route.ts","./src/routes/customers/route.ts","./src/routes/orders/route.ts"],"version":"5.9.3"}
