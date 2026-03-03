@@ -15,12 +15,12 @@ clientRouter.post('/', async (req: express.Request, res: express.Response) => {
     }
     try {
 
-        const exists = await Supplier.find({
+        const exists = await Supplier.findOne({
             $or: [
                 {
                     mobile: supplierDetails.mobile,
                 }, {
-                    company_name: supplierDetails.company_name
+                    company_name: supplierDetails.company_name.toLowerCase()
                 }
             ]
         })
@@ -101,7 +101,7 @@ clientRouter.get('/details/:supplierId', async (req: express.Request, res: expre
             })
             return
         }
-        const orders = await Order.find({ supplier_id: supplierId })
+        const orders = await Order.find({ supplier_id: supplierId }).populate("supplier_id").populate("customer_id")
         res.status(200).json({
             supplier,
             orders,
@@ -116,6 +116,7 @@ clientRouter.get('/details/:supplierId', async (req: express.Request, res: expre
         })
     }
 })
+
 
 
 

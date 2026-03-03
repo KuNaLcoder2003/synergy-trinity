@@ -6,7 +6,7 @@ import ordersRouter from "./orders/route.js"
 const router = express.Router()
 
 router.use('/customer', customerRouter)
-router.use('/client', clientRouter)
+router.use('/supplier', clientRouter)
 router.use('/comapany', comapanyRouter)
 router.use('/order', ordersRouter)
 export default router
