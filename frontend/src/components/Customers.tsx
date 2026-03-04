@@ -1,35 +1,30 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import AddCustomer from "./AddCustomer";
-
-// ── Types ─────────────────────────────────────────────────────────────────────
+import { Loader } from "lucide-react";
+const BACKEND_URL = `${import.meta.env.VITE_BACKEND_URL}`
 type Customer = {
     id: string;
     company_name: string;
     name: string;
     mobile: string;
-    email: string;
+    // email?: string;
     bank_details: string;
-    upi_id: string;
     state: string;
     country: string;
     pincode: string;
 };
 
 type CustomerForm = Omit<Customer, "id">;
-
-// ── Mock Seed Data ────────────────────────────────────────────────────────────
-const SEED_CUSTOMERS: Customer[] = [
-    { id: "CUS-0001", company_name: "Apex Traders Pvt Ltd", name: "Rohan Mehta", mobile: "+91 98201 34567", email: "rohan@apextraders.in", bank_details: "HDFC Bank · A/C 00112233445 · HDFC0001234", upi_id: "rohan@hdfcbank", state: "Maharashtra", country: "India", pincode: "400001" },
-    { id: "CUS-0002", company_name: "Greenleaf Solutions", name: "Priya Sharma", mobile: "+91 70451 22310", email: "priya@greenleaf.co", bank_details: "ICICI Bank · A/C 55667788990 · ICIC0005566", upi_id: "priya.sharma@icici", state: "Karnataka", country: "India", pincode: "560001" },
-    { id: "CUS-0003", company_name: "BlueSky Enterprises", name: "Amit Verma", mobile: "+91 88001 56789", email: "amit@bluesky.biz", bank_details: "SBI · A/C 33445566778 · SBIN0003344", upi_id: "amitverma@sbi", state: "Delhi", country: "India", pincode: "110001" },
-    { id: "CUS-0004", company_name: "Sunrise Retail Co.", name: "Neha Joshi", mobile: "+91 91234 87654", email: "neha@sunrise.retail", bank_details: "Axis Bank · A/C 99887766554 · UTIB0009988", upi_id: "neha@axisbank", state: "Rajasthan", country: "India", pincode: "302001" },
-    { id: "CUS-0005", company_name: "Horizon Imports", name: "Karan Patel", mobile: "+91 63001 44321", email: "karan@horizonimp.com", bank_details: "Kotak Bank · A/C 11223344556 · KKBK0001122", upi_id: "karanpatel@kotak", state: "Gujarat", country: "India", pincode: "380001" },
-    { id: "CUS-0006", company_name: "NovaTech Systems", name: "Sanya Kapoor", mobile: "+91 77889 11234", email: "sanya@novatech.io", bank_details: "Yes Bank · A/C 66778899001 · YESB0006677", upi_id: "sanya@yesbank", state: "Telangana", country: "India", pincode: "500001" },
-    { id: "CUS-0007", company_name: "PureEarth Organics", name: "Dev Nair", mobile: "+91 94500 32100", email: "dev@pureearth.org", bank_details: "Federal Bank · A/C 44556677889 · FDRL0004455", upi_id: "devnair@federal", state: "Kerala", country: "India", pincode: "682001" },
-    { id: "CUS-0008", company_name: "Zenith Distributors", name: "Ananya Roy", mobile: "+91 82340 98765", email: "ananya@zenith.dist", bank_details: "PNB · A/C 22334455667 · PUNB0002233", upi_id: "ananya@pnb", state: "West Bengal", country: "India", pincode: "700001" },
-];
-
-// ── Icons ─────────────────────────────────────────────────────────────────────
+// const SEED_CUSTOMERS: Customer[] = [
+//     { id: "CUS-0001", company_name: "Apex Traders Pvt Ltd", name: "Rohan Mehta", mobile: "+91 98201 34567", bank_details: "HDFC Bank · A/C 00112233445 · HDFC0001234", state: "Maharashtra", country: "India", pincode: "400001" },
+//     { id: "CUS-0002", company_name: "Greenleaf Solutions", name: "Priya Sharma", mobile: "+91 70451 22310", bank_details: "ICICI Bank · A/C 55667788990 · ICIC0005566", state: "Karnataka", country: "India", pincode: "560001" },
+//     { id: "CUS-0003", company_name: "BlueSky Enterprises", name: "Amit Verma", mobile: "+91 88001 56789", bank_details: "SBI · A/C 33445566778 · SBIN0003344", state: "Delhi", country: "India", pincode: "110001" },
+//     { id: "CUS-0004", company_name: "Sunrise Retail Co.", name: "Neha Joshi", mobile: "+91 91234 87654", bank_details: "Axis Bank · A/C 99887766554 · UTIB0009988", state: "Rajasthan", country: "India", pincode: "302001" },
+//     { id: "CUS-0005", company_name: "Horizon Imports", name: "Karan Patel", mobile: "+91 63001 44321", bank_details: "Kotak Bank · A/C 11223344556 · KKBK0001122", state: "Gujarat", country: "India", pincode: "380001" },
+//     { id: "CUS-0006", company_name: "NovaTech Systems", name: "Sanya Kapoor", mobile: "+91 77889 11234", bank_details: "Yes Bank · A/C 66778899001 · YESB0006677", state: "Telangana", country: "India", pincode: "500001" },
+//     { id: "CUS-0007", company_name: "PureEarth Organics", name: "Dev Nair", mobile: "+91 94500 32100", bank_details: "Federal Bank · A/C 44556677889 · FDRL0004455", state: "Kerala", country: "India", pincode: "682001" },
+//     { id: "CUS-0008", company_name: "Zenith Distributors", name: "Ananya Roy", mobile: "+91 82340 98765", bank_details: "PNB · A/C 22334455667 · PUNB0002233", state: "West Bengal", country: "India", pincode: "700001" },
+// ];
 const SearchIcon = () => (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
         <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
@@ -143,20 +138,10 @@ function CustomerDetailDrawer({ customer, index, onClose }: { customer: Customer
                             <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13.5 19.79 19.79 0 0 1 1.61 5a2 2 0 0 1 1.53-2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 10.09a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
                         </svg>
                     } />
-                    <DetailRow label="Email" value={customer.email} icon={
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" />
-                        </svg>
-                    } />
                     <DetailRow label="Bank Details" value={customer.bank_details} icon={
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
                             <line x1="2" y1="10" x2="22" y2="10" /><line x1="12" y1="2" x2="22" y2="10" /><line x1="2" y1="10" x2="12" y2="2" />
                             <rect x="2" y="10" width="20" height="11" rx="1" /><line x1="6" y1="14" x2="6" y2="17" /><line x1="12" y1="14" x2="12" y2="17" /><line x1="18" y1="14" x2="18" y2="17" />
-                        </svg>
-                    } />
-                    <DetailRow label="UPI ID" value={customer.upi_id} icon={
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-                            <rect x="2" y="5" width="20" height="14" rx="2" /><line x1="2" y1="10" x2="22" y2="10" />
                         </svg>
                     } />
                     <DetailRow label="State" value={customer.state} icon={
@@ -205,12 +190,36 @@ function ColHeader({ label, sortable = false }: { label: string; sortable?: bool
 
 // ── Main Component ────────────────────────────────────────────────────────────
 export default function CustomerList() {
-    const [customers, setCustomers] = useState<Customer[]>(SEED_CUSTOMERS);
+    const [customers, setCustomers] = useState<Customer[]>([]);
     const [search, setSearch] = useState("");
     const [showAdd, setShowAdd] = useState(false);
     const [selectedCustomer, setSelectedCustomer] = useState<{ customer: Customer; index: number } | null>(null);
     const [newlyAdded, setNewlyAdded] = useState<string | null>(null);
     const [stateFilter, setStateFilter] = useState("All");
+    const [loading, setLoading] = useState<boolean>(false)
+
+    useEffect(() => {
+        try {
+            fetch(`${BACKEND_URL}/customer/customers`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(async (res: Response) => {
+                const data = await res.json()
+                if (!data.valid) {
+                    setCustomers([])
+                    setLoading(false)
+                } else {
+                    setCustomers(data.customers)
+                    setLoading(false)
+                }
+            })
+        } catch (error) {
+            setLoading(false)
+            setCustomers([])
+        }
+    }, [])
 
     const states = useMemo(() => {
         const all = ["All", ...Array.from(new Set(customers.map((c) => c.state))).sort()];
@@ -242,7 +251,11 @@ export default function CustomerList() {
 
     return (
         <>
-            <style>{`
+            {
+                loading ? <div className="w-full h-full flex items-center justify-center">
+                    <Loader />
+                </div> : <>
+                    <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
         @keyframes rowSlideIn {
           from { opacity: 0; transform: translateY(-8px); background: #d1fae5; }
@@ -259,216 +272,218 @@ export default function CustomerList() {
         ::-webkit-scrollbar-thumb { background: #d1fae5; border-radius: 99px; }
       `}</style>
 
-            <div style={{ fontFamily: "'Inter', sans-serif" }} className="flex flex-col h-full bg-gray-50">
+                    <div style={{ fontFamily: "'Inter', sans-serif" }} className="flex flex-col h-full bg-gray-50">
 
-                {/* ── Top bar ──────────────────────────────────────────────────────── */}
-                <div className="bg-white border-b border-gray-100 px-6 py-4 flex-shrink-0">
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                        {/* Title */}
-                        <div className="flex-1">
-                            <div className="flex items-center gap-2.5">
-                                <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
-                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                                    </svg>
+                        {/* ── Top bar ──────────────────────────────────────────────────────── */}
+                        <div className="bg-white border-b border-gray-100 px-6 py-4 flex-shrink-0">
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                                {/* Title */}
+                                <div className="flex-1">
+                                    <div className="flex items-center gap-2.5">
+                                        <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
+                                                <path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <h2 className="text-base font-bold text-gray-900 leading-tight">Customers</h2>
+                                            <p className="text-xs text-gray-400">{customers.length} total · {filtered.length} shown</p>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h2 className="text-base font-bold text-gray-900 leading-tight">Customers</h2>
-                                    <p className="text-xs text-gray-400">{customers.length} total · {filtered.length} shown</p>
+
+                                {/* Search */}
+                                <div
+                                    className="search-wrap flex items-center gap-2.5 bg-white border border-gray-200 rounded-xl px-3.5 py-2.5 transition-all"
+                                    style={{ minWidth: 240 }}
+                                >
+                                    <span className="text-gray-400"><SearchIcon /></span>
+                                    <input
+                                        type="text"
+                                        value={search}
+                                        onChange={(e) => setSearch(e.target.value)}
+                                        placeholder="Search name, company, state…"
+                                        className="bg-transparent text-sm text-gray-700 outline-none placeholder-gray-400 w-full font-medium"
+                                        style={{ caretColor: "#10b981" }}
+                                    />
+                                    {search && (
+                                        <button onClick={() => setSearch("")} className="text-gray-300 hover:text-gray-500 transition-colors">
+                                            <CloseIcon />
+                                        </button>
+                                    )}
                                 </div>
+
+                                {/* Add button */}
+                                <button
+                                    onClick={() => setShowAdd(true)}
+                                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white flex-shrink-0 transition-all hover:opacity-90 active:scale-95"
+                                    style={{
+                                        background: "linear-gradient(135deg, #10b981, #059669)",
+                                        boxShadow: "0 4px 14px rgba(16,185,129,0.35)",
+                                    }}
+                                >
+                                    <PlusIcon />
+                                    Add Customer
+                                </button>
+                            </div>
+
+                            {/* State filter pills */}
+                            <div className="flex items-center gap-2 mt-4 overflow-x-auto pb-0.5">
+                                <span className="text-xs font-semibold text-gray-400 flex-shrink-0">Filter:</span>
+                                {states.map((s) => (
+                                    <button
+                                        key={s}
+                                        onClick={() => setStateFilter(s)}
+                                        className="filter-pill flex-shrink-0 px-3 py-1 rounded-full text-xs font-semibold border transition-all"
+                                        style={
+                                            stateFilter === s
+                                                ? { background: "#10b981", color: "#fff", borderColor: "#10b981", boxShadow: "0 2px 8px rgba(16,185,129,0.3)" }
+                                                : { background: "#fff", color: "#6b7280", borderColor: "#e5e7eb" }
+                                        }
+                                    >
+                                        {s}
+                                    </button>
+                                ))}
                             </div>
                         </div>
 
-                        {/* Search */}
-                        <div
-                            className="search-wrap flex items-center gap-2.5 bg-white border border-gray-200 rounded-xl px-3.5 py-2.5 transition-all"
-                            style={{ minWidth: 240 }}
-                        >
-                            <span className="text-gray-400"><SearchIcon /></span>
-                            <input
-                                type="text"
-                                value={search}
-                                onChange={(e) => setSearch(e.target.value)}
-                                placeholder="Search name, company, state…"
-                                className="bg-transparent text-sm text-gray-700 outline-none placeholder-gray-400 w-full font-medium"
-                                style={{ caretColor: "#10b981" }}
-                            />
-                            {search && (
-                                <button onClick={() => setSearch("")} className="text-gray-300 hover:text-gray-500 transition-colors">
-                                    <CloseIcon />
-                                </button>
+                        {/* ── Table ────────────────────────────────────────────────────────── */}
+                        <div className="flex-1 overflow-auto">
+                            {filtered.length === 0 ? (
+                                <div className="flex flex-col items-center justify-center h-64 gap-3">
+                                    <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center text-gray-300">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-7 h-7">
+                                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><line x1="23" y1="11" x2="17" y2="11" />
+                                        </svg>
+                                    </div>
+                                    <p className="text-sm font-semibold text-gray-400">No customers match your search</p>
+                                    <button onClick={() => { setSearch(""); setStateFilter("All"); }} className="text-xs text-emerald-500 font-semibold hover:underline">
+                                        Clear filters
+                                    </button>
+                                </div>
+                            ) : (
+                                <table className="w-full border-collapse" style={{ minWidth: 760 }}>
+                                    <thead className="sticky top-0 bg-white border-b border-gray-100 z-10">
+                                        <tr>
+                                            <ColHeader label="Customer" />
+                                            <ColHeader label="Mobile" sortable />
+                                            <ColHeader label="State" sortable />
+                                            <ColHeader label="Company" sortable />
+                                            <ColHeader label="Pincode" />
+                                            <th className="px-5 py-3.5 text-left w-28">
+                                                <span className="text-xs font-bold uppercase tracking-wider text-gray-400">Details</span>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {filtered.map((customer, i) => {
+                                            const isNew = customer.id === newlyAdded;
+                                            return (
+                                                <tr
+                                                    key={customer.id}
+                                                    className={`row-hover border-b border-gray-50 transition-colors cursor-default ${isNew ? "row-new" : ""}`}
+                                                    style={{ animationDelay: `${i * 30}ms` }}
+                                                >
+                                                    {/* Name + ID */}
+                                                    <td className="px-5 py-3.5">
+                                                        <div className="flex items-center gap-3">
+                                                            <Avatar name={customer.name} index={i} />
+                                                            <div>
+                                                                <p className="text-sm font-bold text-gray-800 leading-tight">{customer.name}</p>
+                                                                <p className="text-xs text-gray-400 font-medium mt-0.5 font-mono">{customer.id}</p>
+                                                            </div>
+                                                            {isNew && (
+                                                                <span className="ml-1 px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700">New</span>
+                                                            )}
+                                                        </div>
+                                                    </td>
+
+                                                    {/* Mobile */}
+                                                    <td className="px-5 py-3.5">
+                                                        <p className="text-sm text-gray-700 font-medium tabular-nums">{customer.mobile}</p>
+                                                    </td>
+
+                                                    {/* State */}
+                                                    <td className="px-5 py-3.5">
+                                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gray-50 border border-gray-100 text-xs font-semibold text-gray-600">
+                                                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                                                            {customer.state}
+                                                        </span>
+                                                    </td>
+
+                                                    {/* Company */}
+                                                    <td className="px-5 py-3.5">
+                                                        <p className="text-sm text-gray-700 font-semibold max-w-[180px] truncate" title={customer.company_name}>
+                                                            {customer.company_name}
+                                                        </p>
+                                                    </td>
+
+                                                    {/* Pincode */}
+                                                    <td className="px-5 py-3.5">
+                                                        <p className="text-sm text-gray-500 font-mono font-medium">{customer.pincode}</p>
+                                                    </td>
+
+                                                    {/* View button */}
+                                                    <td className="px-5 py-3.5">
+                                                        <button
+                                                            onClick={() => setSelectedCustomer({ customer, index: i })}
+                                                            className="view-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border border-gray-200 text-xs font-bold text-gray-500"
+                                                        >
+                                                            <EyeIcon />
+                                                            View
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
                             )}
                         </div>
 
-                        {/* Add button */}
-                        <button
-                            onClick={() => setShowAdd(true)}
-                            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white flex-shrink-0 transition-all hover:opacity-90 active:scale-95"
-                            style={{
-                                background: "linear-gradient(135deg, #10b981, #059669)",
-                                boxShadow: "0 4px 14px rgba(16,185,129,0.35)",
-                            }}
-                        >
-                            <PlusIcon />
-                            Add Customer
-                        </button>
-                    </div>
-
-                    {/* State filter pills */}
-                    <div className="flex items-center gap-2 mt-4 overflow-x-auto pb-0.5">
-                        <span className="text-xs font-semibold text-gray-400 flex-shrink-0">Filter:</span>
-                        {states.map((s) => (
-                            <button
-                                key={s}
-                                onClick={() => setStateFilter(s)}
-                                className="filter-pill flex-shrink-0 px-3 py-1 rounded-full text-xs font-semibold border transition-all"
-                                style={
-                                    stateFilter === s
-                                        ? { background: "#10b981", color: "#fff", borderColor: "#10b981", boxShadow: "0 2px 8px rgba(16,185,129,0.3)" }
-                                        : { background: "#fff", color: "#6b7280", borderColor: "#e5e7eb" }
-                                }
-                            >
-                                {s}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-
-                {/* ── Table ────────────────────────────────────────────────────────── */}
-                <div className="flex-1 overflow-auto">
-                    {filtered.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center h-64 gap-3">
-                            <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center text-gray-300">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-7 h-7">
-                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><line x1="23" y1="11" x2="17" y2="11" />
-                                </svg>
+                        {/* ── Footer ───────────────────────────────────────────────────────── */}
+                        <div className="bg-white border-t border-gray-100 px-6 py-3 flex items-center justify-between flex-shrink-0">
+                            <p className="text-xs text-gray-400">
+                                Showing <span className="font-bold text-gray-600">{filtered.length}</span> of <span className="font-bold text-gray-600">{customers.length}</span> customers
+                            </p>
+                            <div className="flex items-center gap-1">
+                                {[...Array(Math.ceil(filtered.length / 10))].map((_, i) => (
+                                    <button
+                                        key={i}
+                                        className="w-7 h-7 rounded-lg text-xs font-bold transition-all"
+                                        style={i === 0
+                                            ? { background: "#10b981", color: "#fff", boxShadow: "0 2px 8px rgba(16,185,129,0.3)" }
+                                            : { color: "#6b7280" }}
+                                    >
+                                        {i + 1}
+                                    </button>
+                                ))}
                             </div>
-                            <p className="text-sm font-semibold text-gray-400">No customers match your search</p>
-                            <button onClick={() => { setSearch(""); setStateFilter("All"); }} className="text-xs text-emerald-500 font-semibold hover:underline">
-                                Clear filters
-                            </button>
                         </div>
-                    ) : (
-                        <table className="w-full border-collapse" style={{ minWidth: 760 }}>
-                            <thead className="sticky top-0 bg-white border-b border-gray-100 z-10">
-                                <tr>
-                                    <ColHeader label="Customer" />
-                                    <ColHeader label="Mobile" sortable />
-                                    <ColHeader label="State" sortable />
-                                    <ColHeader label="Company" sortable />
-                                    <ColHeader label="Pincode" />
-                                    <th className="px-5 py-3.5 text-left w-28">
-                                        <span className="text-xs font-bold uppercase tracking-wider text-gray-400">Details</span>
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {filtered.map((customer, i) => {
-                                    const isNew = customer.id === newlyAdded;
-                                    return (
-                                        <tr
-                                            key={customer.id}
-                                            className={`row-hover border-b border-gray-50 transition-colors cursor-default ${isNew ? "row-new" : ""}`}
-                                            style={{ animationDelay: `${i * 30}ms` }}
-                                        >
-                                            {/* Name + ID */}
-                                            <td className="px-5 py-3.5">
-                                                <div className="flex items-center gap-3">
-                                                    <Avatar name={customer.name} index={i} />
-                                                    <div>
-                                                        <p className="text-sm font-bold text-gray-800 leading-tight">{customer.name}</p>
-                                                        <p className="text-xs text-gray-400 font-medium mt-0.5 font-mono">{customer.id}</p>
-                                                    </div>
-                                                    {isNew && (
-                                                        <span className="ml-1 px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700">New</span>
-                                                    )}
-                                                </div>
-                                            </td>
-
-                                            {/* Mobile */}
-                                            <td className="px-5 py-3.5">
-                                                <p className="text-sm text-gray-700 font-medium tabular-nums">{customer.mobile}</p>
-                                            </td>
-
-                                            {/* State */}
-                                            <td className="px-5 py-3.5">
-                                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gray-50 border border-gray-100 text-xs font-semibold text-gray-600">
-                                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                                                    {customer.state}
-                                                </span>
-                                            </td>
-
-                                            {/* Company */}
-                                            <td className="px-5 py-3.5">
-                                                <p className="text-sm text-gray-700 font-semibold max-w-[180px] truncate" title={customer.company_name}>
-                                                    {customer.company_name}
-                                                </p>
-                                            </td>
-
-                                            {/* Pincode */}
-                                            <td className="px-5 py-3.5">
-                                                <p className="text-sm text-gray-500 font-mono font-medium">{customer.pincode}</p>
-                                            </td>
-
-                                            {/* View button */}
-                                            <td className="px-5 py-3.5">
-                                                <button
-                                                    onClick={() => setSelectedCustomer({ customer, index: i })}
-                                                    className="view-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border border-gray-200 text-xs font-bold text-gray-500"
-                                                >
-                                                    <EyeIcon />
-                                                    View
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    );
-                                })}
-                            </tbody>
-                        </table>
-                    )}
-                </div>
-
-                {/* ── Footer ───────────────────────────────────────────────────────── */}
-                <div className="bg-white border-t border-gray-100 px-6 py-3 flex items-center justify-between flex-shrink-0">
-                    <p className="text-xs text-gray-400">
-                        Showing <span className="font-bold text-gray-600">{filtered.length}</span> of <span className="font-bold text-gray-600">{customers.length}</span> customers
-                    </p>
-                    <div className="flex items-center gap-1">
-                        {[...Array(Math.ceil(filtered.length / 10))].map((_, i) => (
-                            <button
-                                key={i}
-                                className="w-7 h-7 rounded-lg text-xs font-bold transition-all"
-                                style={i === 0
-                                    ? { background: "#10b981", color: "#fff", boxShadow: "0 2px 8px rgba(16,185,129,0.3)" }
-                                    : { color: "#6b7280" }}
-                            >
-                                {i + 1}
-                            </button>
-                        ))}
                     </div>
-                </div>
-            </div>
 
-            {/* ── Add Customer Modal ────────────────────────────────────────────── */}
-            {showAdd && (
-                <AddCustomer
-                    onClose={() => setShowAdd(false)}
-                    onSubmit={(data: any) => {
-                        handleAddCustomer(data);
-                        setShowAdd(false);
-                    }}
-                />
-            )}
+                    {/* ── Add Customer Modal ────────────────────────────────────────────── */}
+                    {showAdd && (
+                        <AddCustomer
+                            onClose={() => setShowAdd(false)}
+                            onSubmit={(data: any) => {
+                                handleAddCustomer(data);
+                                setShowAdd(false);
+                            }}
+                        />
+                    )}
 
-            {/* ── Detail Drawer ────────────────────────────────────────────────── */}
-            {selectedCustomer && (
-                <CustomerDetailDrawer
-                    customer={selectedCustomer.customer}
-                    index={selectedCustomer.index}
-                    onClose={() => setSelectedCustomer(null)}
-                />
-            )}
+                    {/* ── Detail Drawer ────────────────────────────────────────────────── */}
+                    {selectedCustomer && (
+                        <CustomerDetailDrawer
+                            customer={selectedCustomer.customer}
+                            index={selectedCustomer.index}
+                            onClose={() => setSelectedCustomer(null)}
+                        />
+                    )}
+                </>
+            }
         </>
     );
 }
