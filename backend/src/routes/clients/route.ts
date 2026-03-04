@@ -66,6 +66,10 @@ clientRouter.get('/suppliers', async (req: express.Request, res: express.Respons
             })
             return
         }
+        res.status(200).json({
+            suppliers,
+            valid: true
+        })
     } catch (error) {
         console.log(error)
         res.status(500).json({
