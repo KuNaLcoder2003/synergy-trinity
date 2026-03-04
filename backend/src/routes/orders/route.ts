@@ -65,7 +65,6 @@ ordersRouter.post("/", async (req: express.Request, res: express.Response) => {
     }
 })
 
-
 ordersRouter.post('/addDocs', upload.array("doc"), async (req: express.Request, res: express.Response) => {
     try {
         const docs_details: OrderDocs[] = JSON.parse(req.body.docs_details);
@@ -215,6 +214,29 @@ ordersRouter.get('/summary', async (req: express.Request, res: express.Response)
             "attachment; filename=report.xlsx"
         )
         res.send(buffer)
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({
+            message: "Something went wrong",
+            valid: false
+        })
+    }
+})
+
+ordersRouter.get('/all', async (req: express.Request, res: express.Response) => {
+    try {
+        const orders = await Order.find().populate("customer_id").populate("supplier_id")
+        if (!orders) {
+            res.status(403).json({
+                message: "Unable to get orders",
+                valid: false
+            })
+            return
+        }
+        res.status(200).json({
+            orders,
+            valid: true
+        })
     } catch (error) {
         console.log(error)
         res.status(500).json({
