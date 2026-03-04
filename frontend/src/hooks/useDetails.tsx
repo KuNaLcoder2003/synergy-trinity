@@ -18,7 +18,6 @@ type customer = {
     bank_details: string;
     country: string;
     pincode: string;
-    upi_id: string;
     state: string;
 };
 type Order = {
