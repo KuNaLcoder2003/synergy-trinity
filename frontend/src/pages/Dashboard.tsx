@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { } from "lucide-react";
 import CustomerList from "../components/Customers";
 import SupplierList from "../components/Suppliers";
+import Orders from "../components/Orders";
 
 /* =======================
    TYPES
@@ -381,7 +382,7 @@ const DashBoard: React.FC = () => {
                         style={{ scrollBehavior: "smooth" }}
                     >
                         {
-                            activeTab == "Tab-4" ? <CustomerList /> : activeTab == 'Tab-3' ? <SupplierList /> : <div className={`content-fade ${contentVisible ? "content-visible" : "content-hidden"}`}>
+                            activeTab == "Tab-4" ? <CustomerList /> : activeTab == 'Tab-3' ? <SupplierList /> : activeTab == 'Tab-2' ? <Orders /> : <div className={`content-fade ${contentVisible ? "content-visible" : "content-hidden"}`}>
 
                                 {/* Stat Cards */}
                                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
