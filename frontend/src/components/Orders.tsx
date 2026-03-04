@@ -1,4 +1,6 @@
+import { PlusIcon } from "lucide-react";
 import { useEffect, useState } from "react";
+import CreateOrderForm from "./CreateOrderForm";
 
 const BACKEND_URL = `${import.meta.env.VITE_BACKEND_URL}`
 
@@ -333,7 +335,7 @@ const OrderModal: React.FC<OrderModalProps> = ({ order, onClose }) => (
 const Orders: React.FC = () => {
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
     const [search, setSearch] = useState<string>("");
-
+    const [showAdd, setShowAdd] = useState<boolean>(false);
     const [orders, setOrders] = useState<Order[]>([])
     const [filtered, setFiltered] = useState<Order[]>([])
 
@@ -382,25 +384,38 @@ const Orders: React.FC = () => {
                         <h2 className="text-base font-bold text-gray-900">All Orders</h2>
                         <p className="text-xs text-gray-400 mt-0.5">{filtered.length} orders found</p>
                     </div>
-                    <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-3.5 py-2 w-56 shadow-sm">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-gray-400 flex-shrink-0">
-                            <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
-                        </svg>
-                        <input
-                            className="bg-transparent text-sm text-gray-600 outline-none placeholder-gray-400 w-full"
-                            placeholder="Search orders..."
-                            value={search}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                                setSearch(e.target.value);
-                                setFiltered(orders.filter(o =>
-                                    !search ||
-                                    o._id.toLowerCase().includes(e.target.value.toLowerCase()) ||
-                                    o.customer_id?.name.toLowerCase().includes(e.target.value.toLowerCase()) ||
-                                    o.supplier_id?.name.toLowerCase().includes(e.target.value.toLowerCase()) ||
-                                    o.shipping_line?.toLowerCase().includes(e.target.value.toLowerCase())
-                                ));
+                    <div className="flex items-center gap-4">
+                        <button
+                            onClick={() => setShowAdd(true)}
+                            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white flex-shrink-0 transition-all hover:opacity-90 active:scale-95"
+                            style={{
+                                background: "linear-gradient(135deg, #10b981, #059669)",
+                                boxShadow: "0 4px 14px rgba(16,185,129,0.35)",
                             }}
-                        />
+                        >
+                            <PlusIcon />
+                            New Order
+                        </button>
+                        <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-3.5 py-2 w-56 shadow-sm">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-gray-400 flex-shrink-0">
+                                <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+                            </svg>
+                            <input
+                                className="bg-transparent text-sm text-gray-600 outline-none placeholder-gray-400 w-full"
+                                placeholder="Search orders..."
+                                value={search}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                    setSearch(e.target.value);
+                                    setFiltered(orders.filter(o =>
+                                        !search ||
+                                        o._id.toLowerCase().includes(e.target.value.toLowerCase()) ||
+                                        o.customer_id?.name.toLowerCase().includes(e.target.value.toLowerCase()) ||
+                                        o.supplier_id?.name.toLowerCase().includes(e.target.value.toLowerCase()) ||
+                                        o.shipping_line?.toLowerCase().includes(e.target.value.toLowerCase())
+                                    ));
+                                }}
+                            />
+                        </div>
                     </div>
                 </div>
 
@@ -454,6 +469,14 @@ const Orders: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+            {
+                showAdd && (
+                    <div className="absolute inset-0 top-0 bottom-0 left-0 right-0 bg-black/20">
+                        <CreateOrderForm onClose={() => setShowAdd(false)} />
+                    </div>
+                )
+            }
 
             {/* Modal */}
             {selectedOrder && (
