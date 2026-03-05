@@ -381,7 +381,7 @@ const CreateOrderForm: React.FC<CreateOrderFormProps> = ({ onClose }) => {
         }
     };
 
-    /* ── SUBMIT DOCS ── */
+    //
 
     const handleDocsSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
