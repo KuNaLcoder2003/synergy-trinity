@@ -42,3 +42,25 @@ export type Orders = {
     shipping_line: string,
     country_of_origin_of_goods: string,
 }
+
+export type Suppliers = {
+    _id: string
+    name: string,
+    mobile: string,
+    country: string,
+    state: string,
+    pincode: string,
+    bank_details: string,
+    company_name: string
+}
+
+export type Customers = {
+    _id: string
+    name: string,
+    mobile: string,
+    country: string,
+    state: string,
+    pincode: string,
+    bank_details: string,
+    company_name: string
+}
