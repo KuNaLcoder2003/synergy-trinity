@@ -59,7 +59,7 @@ const docsSchema = new Schema(
         issued_by: { type: String },
         total_value: { type: String },
     },
-    { _id: false }
+    { _id: true }
 );
 
 
