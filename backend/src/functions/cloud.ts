@@ -54,5 +54,9 @@ export const uploadMultipleFiles = async (buffer: Buffer[]) => {
 
 }
 
+export const deleteFromCloud = async (public_id: string) => {
+    const deleted = await cloud.uploader.destroy(public_id)
+}
+
 
 export default uploadToCloud;
