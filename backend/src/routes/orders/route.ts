@@ -17,6 +17,7 @@ type OrderDocs = {
 }
 
 type OrderDocsObj = {
+    _id?: mongoose.Types.ObjectId,
     gross_weight: number | null;
     net_weight: number | null;
     doc_url: string | null;
@@ -53,6 +54,7 @@ ordersRouter.post("/", async (req: express.Request, res: express.Response) => {
         }
         await new_order.save()
         res.status(200).json({
+            orderId: new_order._id,
             message: "Sucesfully created new order"
         })
     } catch (error) {
@@ -242,6 +244,116 @@ ordersRouter.get('/all', async (req: express.Request, res: express.Response) => 
         res.status(500).json({
             message: "Something went wrong",
             valid: false
+        })
+    }
+})
+
+ordersRouter.put('/editOrder', async (req: express.Request, res: express.Response) => {
+    try {
+        const orderDetails: Orders = req.body.order_details;
+        const orderId = req.body.orderId;
+        if (!orderId) {
+            res.status(400).json({
+                message: "Bad request",
+                valid: false
+            })
+            return
+        }
+        if (!orderDetails) {
+            res.status(400).json({
+                message: "Bad request",
+                valid: false
+            })
+            return
+        }
+        const updated_order = Order.findByIdAndUpdate(orderId, orderDetails)
+        if (!updated_order) {
+            res.status(403).json({
+                message: "Unable to update order",
+                valid: false
+            })
+            return
+        }
+        res.status(200).json({
+            message: 'Order updated'
+        })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({
+            message: "Something went wrong",
+            valid: false,
+            error: error
+        })
+    }
+})
+
+ordersRouter.put('/editDocs', upload.array("doc"), async (req: express.Request, res: express.Response) => {
+    try {
+        const docs_data: OrderDocs[] = req.body.docs_data;
+        const orderId = req.body.orderId;
+        if (!orderId) {
+            res.status(400).json({
+                message: 'Bad request',
+                valid: false
+            })
+            return
+        }
+        if (!mongoose.Types.ObjectId.isValid(orderId)) {
+            res.status(400).json({
+                message: 'Bad request',
+                valid: false
+            })
+            return
+        }
+        const order = await Order.findById(orderId)
+        if (!order) {
+            res.status(404).json({
+                message: "Order not found",
+                valid: false
+            })
+            return
+        }
+        // cloud call
+        const docs = req.files as Express.Multer.File[]
+        if (!docs) {
+            res.status(400).json({
+                message: "Files missing",
+                valid: false
+            })
+            return
+        }
+        const buffer = docs.map(doc => {
+            return Buffer.from(doc.buffer)
+        })
+        const { failed, passed } = await uploadMultipleFiles(buffer)
+        if (failed.length > 0) {
+            res.status(403).json({
+                message: "Unable to upload to cloud",
+                valid: false
+            })
+            return
+        }
+        const merged_arr: OrderDocsObj[] = docs_data.map(doc => {
+            let temp: OrderDocsObj = { ...doc, doc_url: "" }
+            passed.map(cloudResponse => {
+                temp.doc_url = cloudResponse.url as string
+            })
+            return temp
+        })
+        const newDocsMap = new Map(merged_arr.map(d => [d._id!.toString(), d]))
+
+        const updatedDocs = order.docs.map(doc =>
+            newDocsMap.get(doc._id.toString()) || doc
+        )
+        order.set("docs", updatedDocs)
+        await order.save()
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({
+            message: "Something went wrong",
+            valid: false,
+            error: error
         })
     }
 })
