@@ -289,7 +289,7 @@ ordersRouter.put('/editOrder', async (req: express.Request, res: express.Respons
 
 ordersRouter.put('/editDocs', upload.array("doc"), async (req: express.Request, res: express.Response) => {
     try {
-        const docs_data: OrderDocs[] = req.body.docs_data;
+        const docs_data: OrderDocs[] = JSON.parse(req.body.docs_data);
         const orderId = req.body.orderId;
         if (!orderId) {
             res.status(400).json({
@@ -313,7 +313,6 @@ ordersRouter.put('/editDocs', upload.array("doc"), async (req: express.Request, 
             })
             return
         }
-        // cloud call
         const docs = req.files as Express.Multer.File[]
         if (!docs) {
             res.status(400).json({
@@ -325,6 +324,7 @@ ordersRouter.put('/editDocs', upload.array("doc"), async (req: express.Request, 
         const buffer = docs.map(doc => {
             return Buffer.from(doc.buffer)
         })
+        // cloud call
         const { failed, passed } = await uploadMultipleFiles(buffer)
         if (failed.length > 0) {
             res.status(403).json({
@@ -333,13 +333,12 @@ ordersRouter.put('/editDocs', upload.array("doc"), async (req: express.Request, 
             })
             return
         }
-        const merged_arr: OrderDocsObj[] = docs_data.map(doc => {
-            let temp: OrderDocsObj = { ...doc, doc_url: "" }
-            passed.map(cloudResponse => {
-                temp.doc_url = cloudResponse.url as string
-            })
+        console.log(passed)
+        const merged_arr: OrderDocsObj[] = docs_data.map((doc, index) => {
+            let temp: OrderDocsObj = { ...doc, doc_url: passed[index] ? passed[index]?.url! : "" }
             return temp
         })
+        console.log(merged_arr)
         const newDocsMap = new Map(merged_arr.map(d => [d._id!.toString(), d]))
 
         const updatedDocs = order.docs.map(doc =>
@@ -347,7 +346,10 @@ ordersRouter.put('/editDocs', upload.array("doc"), async (req: express.Request, 
         )
         order.set("docs", updatedDocs)
         await order.save()
-
+        res.status(200).json({
+            message: "Successfully edited docs",
+            valid: true
+        })
     } catch (error) {
         console.log(error)
         res.status(500).json({
@@ -357,7 +359,5 @@ ordersRouter.put('/editDocs', upload.array("doc"), async (req: express.Request, 
         })
     }
 })
-
-
 
 export default ordersRouter;
