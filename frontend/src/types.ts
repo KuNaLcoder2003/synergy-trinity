@@ -18,7 +18,8 @@ export type Docs = {
     gross_weight: number,
     net_weight: number,
     issued_by: string,
-    total_value: string
+    total_value: string,
+    _id?: string
 }
 
 export type Orders = {
