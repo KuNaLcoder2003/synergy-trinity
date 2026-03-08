@@ -1,6 +1,7 @@
 import { PlusIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import CreateOrderForm from "./CreateOrderForm";
+import EditDocModal from "./EditDocs";
 
 const BACKEND_URL = `${import.meta.env.VITE_BACKEND_URL}`
 
@@ -25,6 +26,7 @@ interface Doc {
     net_weight: number;
     issued_by: string;
     total_value: string;
+    _id: string;
 }
 
 interface PopulatedRef {
@@ -84,18 +86,16 @@ const BoxIcon: React.FC = () => (
     </svg>
 );
 
-const ExternalLinkIcon: React.FC = () => (
+export const ExternalLinkIcon: React.FC = () => (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5">
         <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
         <polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" />
     </svg>
 );
 
-/* ══════════════════════════════════════════
-   HELPERS
-══════════════════════════════════════════ */
 
-const fmtDate = (d?: string): string => {
+
+export const fmtDate = (d?: string): string => {
     if (!d) return "—";
     const dt = new Date(d);
     return dt.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
@@ -155,7 +155,7 @@ const Accordion: React.FC<AccordionProps> = ({ icon, label, count, children }) =
 
 
 const DocRow: React.FC<{ doc: Doc }> = ({ doc }) => (
-    <div className="px-4 py-4 bg-white">
+    <div key={doc._id} className="px-4 py-4 bg-white">
         <div className="flex items-start justify-between gap-4 mb-3">
             <div>
                 <p className="text-sm font-semibold text-gray-800">{doc.doc_name}</p>
@@ -338,6 +338,7 @@ const Orders: React.FC = () => {
     const [showAdd, setShowAdd] = useState<boolean>(false);
     const [orders, setOrders] = useState<Order[]>([])
     const [filtered, setFiltered] = useState<Order[]>([])
+    const [editDocs, setEditDocs] = useState<boolean>(false)
 
     useEffect(() => {
         try {
@@ -452,15 +453,29 @@ const Orders: React.FC = () => {
                                         <td className="px-5 py-4 text-gray-500 text-xs max-w-[130px] truncate">{order.cha}</td>
                                         <td className="px-5 py-4 text-gray-500 text-xs">{fmtDate(order.expected_to_arrive)}</td>
                                         <td className="px-5 py-4">
-                                            <button
-                                                onClick={() => setSelectedOrder(order)}
-                                                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold shadow-sm shadow-emerald-200 transition-all hover:shadow-md hover:shadow-emerald-200 active:scale-95"
-                                            >
-                                                View
-                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3">
-                                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" />
-                                                </svg>
-                                            </button>
+                                            <div className="flex items-center gap-4">
+                                                <button
+                                                    onClick={() => setSelectedOrder(order)}
+                                                    className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold shadow-sm shadow-emerald-200 transition-all hover:shadow-md hover:shadow-emerald-200 active:scale-95"
+                                                >
+                                                    View
+                                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3">
+                                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" />
+                                                    </svg>
+                                                </button>
+                                                <button
+                                                    onClick={() => {
+                                                        setSelectedOrder(order)
+                                                        setEditDocs(true)
+                                                    }}
+                                                    className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold shadow-sm shadow-emerald-200 transition-all hover:shadow-md hover:shadow-emerald-200 active:scale-95"
+                                                >
+                                                    Edit Docs
+                                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3">
+                                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" />
+                                                    </svg>
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}
@@ -478,8 +493,17 @@ const Orders: React.FC = () => {
                 )
             }
 
+            {
+                editDocs && selectedOrder && <div className="absolute inset-0 top-0 bottom-0 left-0 right-0 bg-black/20">
+                    <EditDocModal docs={selectedOrder.docs} orderId={selectedOrder._id} onClose={() => {
+                        setEditDocs(false)
+                        setSelectedOrder(null)
+                    }} />
+                </div>
+            }
+
             {/* Modal */}
-            {selectedOrder && (
+            {selectedOrder && !editDocs && (
                 <div className="modal-animate">
                     <OrderModal order={selectedOrder} onClose={() => setSelectedOrder(null)} />
                 </div>
