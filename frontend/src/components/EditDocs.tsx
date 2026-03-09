@@ -251,8 +251,7 @@ const EditDocModal: React.FC<{ orderId: string; docs: Doc[]; onClose?: () => voi
     const [files, setFiles] = useState<File[]>([]);
     const [submitting, setSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
-
-    const selectedDoc = docs.find(d => d._id === selectedId) ?? null;
+    const [selectedDoc, setSelectedDoc] = useState(docs.find(d => d._id === selectedId) ?? null)
 
     const handleSave = (updated: Doc, file: File | null) => {
         setEditedDocs(prev => {
@@ -356,7 +355,10 @@ const EditDocModal: React.FC<{ orderId: string; docs: Doc[]; onClose?: () => voi
                                     doc={doc}
                                     isSelected={selectedId === doc._id}
                                     isEdited={isEdited(doc._id)}
-                                    onClick={() => setSelectedId(doc._id)}
+                                    onClick={() => {
+                                        setSelectedId(doc._id)
+                                        setSelectedDoc(doc)
+                                    }}
                                 />
                             ))}
                         </div>
