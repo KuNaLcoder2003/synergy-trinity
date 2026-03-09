@@ -15,7 +15,7 @@ function App() {
       <Routes>
         <Route path='/signin' element={<Signin />} />
         <Route path='/' element={<DashBoard />} />
-        <Route path='/bill' element={<SalesBill />} />
+        <Route path='/bill/:orderId' element={<SalesBill />} />
         <Route path='/temp' element={<Temp />} />
       </Routes>
     </>
