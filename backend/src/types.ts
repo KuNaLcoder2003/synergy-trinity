@@ -7,6 +7,7 @@ export type Suppliers = {
     state: string,
     pincode: string,
     bank_details: string,
+    company_address: string,
     company_name: string
 }
 
@@ -17,6 +18,7 @@ export type Customers = {
     state: string,
     pincode: string,
     bank_details: string,
+    company_address: string,
     company_name: string
 }
 
