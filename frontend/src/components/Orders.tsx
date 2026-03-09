@@ -1,7 +1,8 @@
-import { PlusIcon } from "lucide-react";
+import { PlusIcon, Receipt } from "lucide-react";
 import { useEffect, useState } from "react";
 import CreateOrderForm from "./CreateOrderForm";
 import EditDocModal from "./EditDocs";
+import { useNavigate } from "react-router-dom";
 
 const BACKEND_URL = `${import.meta.env.VITE_BACKEND_URL}`
 
@@ -339,6 +340,7 @@ const Orders: React.FC = () => {
     const [orders, setOrders] = useState<Order[]>([])
     const [filtered, setFiltered] = useState<Order[]>([])
     const [editDocs, setEditDocs] = useState<boolean>(false)
+    const navigate = useNavigate();
 
     useEffect(() => {
         try {
@@ -474,6 +476,13 @@ const Orders: React.FC = () => {
                                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3">
                                                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" />
                                                     </svg>
+                                                </button>
+                                                <button
+                                                    onClick={() => navigate(`/bill/${order._id}`)}
+                                                    className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold shadow-sm shadow-emerald-200 transition-all hover:shadow-md hover:shadow-emerald-200 active:scale-95"
+                                                >
+                                                    Generate Sales Bill
+                                                    <Receipt size={12} color="white" />
                                                 </button>
                                             </div>
                                         </td>
