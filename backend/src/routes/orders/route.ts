@@ -360,4 +360,37 @@ ordersRouter.put('/editDocs', upload.array("doc"), async (req: express.Request, 
     }
 })
 
+ordersRouter.get('/details/:orderId', async (req: express.Request, res: express.Response) => {
+    try {
+        const orderId = req.params.orderId;
+        if (!orderId) {
+            res.status(400).json({
+                message: "Bad request",
+                valid: false
+            })
+            return
+        }
+        if (!mongoose.Types.ObjectId.isValid(orderId)) {
+            res.status(400).json({
+                message: "Invalid ID type",
+                valid: false
+            })
+            return
+        }
+        const order = await Order.findById(orderId).populate("customer_id")
+        res.status(200).json({
+            order,
+            valid: true
+        })
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({
+            message: "Something went wrong",
+            error: error,
+            valid: false
+        })
+    }
+})
+
 export default ordersRouter;
