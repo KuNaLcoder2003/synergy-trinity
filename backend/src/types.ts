@@ -31,6 +31,7 @@ export type Material = {
     selling_price: number,
     gst_amount_sales_bill: number,
     purchase_price: number
+    unit_price: number
 }
 
 export type Docs = {
