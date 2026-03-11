@@ -32,6 +32,7 @@ export type Material = {
     gst_amount_sales_bill: number,
     purchase_price: number
     unit_price?: number
+
 }
 
 export type Docs = {
@@ -52,7 +53,7 @@ export type Orders = {
     materials: Material[],
     bill_of_lading_number: string,
     cha: string,
-    container_number: string,
+    container_number?: string,
     customer_id: string,
     dilevery: string,
     supplier_id: string,
