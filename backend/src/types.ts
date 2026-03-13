@@ -1,6 +1,7 @@
 import type mongoose from "mongoose"
 
 export type Suppliers = {
+    _id: mongoose.Schema.Types.ObjectId,
     name: string,
     mobile: string,
     country: string,
@@ -12,6 +13,7 @@ export type Suppliers = {
 }
 
 export type Customers = {
+    _id: mongoose.Schema.Types.ObjectId,
     name: string,
     mobile: string,
     country: string,
@@ -22,20 +24,28 @@ export type Customers = {
     company_name: string
 }
 
+export type Image = {
+    url: string
+}
+
 export type Material = {
+    _id: mongoose.Schema.Types.ObjectId,
     container_number: string,
     gross_weight: number,
     net_weight: number,
     material_description: string,
     sales_bill_price: number,
-    selling_price: number,
+    selling_price_with_gst: number,
     gst_amount_sales_bill: number,
-    purchase_price: number
-    unit_price?: number
+    total_duty: number,
+    purchase_price_per_unit: number,
+    bill_of_entry: string,
+    images: Image[]
 
 }
 
 export type Docs = {
+    _id: mongoose.Schema.Types.ObjectId
     clearing_price: string,
     created_at: string,
     doc_name: string,
@@ -48,12 +58,11 @@ export type Docs = {
 }
 
 export type Orders = {
-    id: mongoose.Schema.Types.ObjectId,
+    _id: mongoose.Schema.Types.ObjectId,
     docs: Docs[],
     materials: Material[],
     bill_of_lading_number: string,
     cha: string,
-    container_number?: string,
     customer_id: string,
     dilevery: string,
     supplier_id: string,

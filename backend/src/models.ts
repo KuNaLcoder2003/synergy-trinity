@@ -1,7 +1,4 @@
-import mongoose, { Schema, Types } from "mongoose";
-import { type Customers } from "./types.js";
-
-
+import { Schema, Types } from "mongoose";
 
 export const supplierSchema = new Schema(
     {
@@ -15,7 +12,6 @@ export const supplierSchema = new Schema(
         company_name: { type: String, required: true },
     },
     { _id: true, timestamps: true },
-
 );
 
 
@@ -41,9 +37,18 @@ const materialSchema = new Schema(
         net_weight: { type: Number },
         material_description: { type: String },
         sales_bill_price: { type: Number },
-        selling_price: { type: Number },
+        selling_price_with_gst: { type: Number },
         gst_amount_sales_bill: { type: Number },
-        purchase_price: { type: Number },
+        total_duty: { type: Number },
+        purchase_price_per_unit: { type: Number },
+        bill_of_entry: { type: String },
+        images: [
+            {
+                url: {
+                    type: String
+                }
+            }
+        ]
     },
     { _id: false }
 );
@@ -69,7 +74,6 @@ export const orderSchema = new Schema(
     {
         bill_of_lading_number: { type: String },
         cha: { type: String },
-        container_number: { type: String },
         dilevery: { type: String },
 
         customer_id: {
@@ -87,6 +91,9 @@ export const orderSchema = new Schema(
         expected_to_arrive: { type: String },
         loading_date: { type: String },
         shipped_on_date: { type: String },
+
+        freight_cost: { type: Number },
+        shipping_line_cost: { type: Number },
 
         mill_payment_status: { type: String },
         mill_payment: { type: Number },
