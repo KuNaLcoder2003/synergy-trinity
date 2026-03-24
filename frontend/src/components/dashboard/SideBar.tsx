@@ -1,0 +1,9 @@
+import type React from "react"
+
+const SideBar: React.FC = () => {
+    return (
+        <div>
+
+        </div>
+    )
+}

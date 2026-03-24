@@ -6,7 +6,8 @@ export type Suppliers = {
     mobile: string,
     country: string,
     state: string,
-    pincode: string,
+    email: string,
+    pin_code: string,
     bank_details: string,
     company_address: string,
     company_name: string
@@ -18,10 +19,13 @@ export type Customers = {
     mobile: string,
     country: string,
     state: string,
-    pincode: string,
+    email: string,
+    pin_code: string,
     bank_details: string,
     company_address: string,
-    company_name: string
+    company_name: string,
+    gst_no: string,
+    pan_no: string,
 }
 
 export type Image = {
