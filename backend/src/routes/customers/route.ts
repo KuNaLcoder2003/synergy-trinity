@@ -15,7 +15,7 @@ customerRouter.post('/newCustomer', async (req: express.Request, res: express.Re
             })
             return
         }
-        const cutomer = await Customer.findOne({
+        const customer = await Customer.findOne({
             $or: [
                 {
                     mobile: customer_details.mobile
@@ -25,7 +25,7 @@ customerRouter.post('/newCustomer', async (req: express.Request, res: express.Re
                 }
             ]
         })
-        if (!customer_details) {
+        if (!customer) {
             res.status(400).json({
                 message: "Cutomer already exists",
                 valid: false
