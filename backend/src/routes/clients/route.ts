@@ -4,7 +4,7 @@ import { Order, Supplier } from "../../mongoose.js"
 import mongoose from "mongoose"
 const clientRouter = express.Router()
 
-clientRouter.post('/newCustomer', async (req: express.Request, res: express.Response) => {
+clientRouter.post('/newSupplier', async (req: express.Request, res: express.Response) => {
     try {
         const supplier_details: Suppliers = req.body
         if (!supplier_details) {
@@ -24,7 +24,7 @@ clientRouter.post('/newCustomer', async (req: express.Request, res: express.Resp
                 }
             ]
         })
-        if (!supplier) {
+        if (supplier) {
             res.status(400).json({
                 message: "Cutomer already exists",
                 valid: false
@@ -53,6 +53,27 @@ clientRouter.post('/newCustomer', async (req: express.Request, res: express.Resp
     }
 })
 
+clientRouter.get("/all", async (req: express.Request, res: express.Response) => {
+    try {
+        const suppliers = await Supplier.find({})
+        if (!suppliers || suppliers == null) {
+            res.status(403).json({
+                message: "Unable to fetch customers",
+                valid: false
+            })
+            return
+        }
+        res.status(200).json({
+            suppliers,
+            valid: true
+        })
+    } catch (error) {
+        res.status(500).json({
+            message: "Something went wrong",
+            valid: true
+        })
+    }
+})
 
 
 
