@@ -1,7 +1,7 @@
 import type mongoose from "mongoose"
 
 export type Suppliers = {
-    _id: mongoose.Schema.Types.ObjectId,
+    _id?: mongoose.Schema.Types.ObjectId,
     name: string,
     mobile: string,
     country: string,
@@ -14,7 +14,7 @@ export type Suppliers = {
 }
 
 export type Customers = {
-    _id: mongoose.Schema.Types.ObjectId,
+    _id?: mongoose.Schema.Types.ObjectId,
     name: string,
     mobile: string,
     country: string,
@@ -33,7 +33,7 @@ export type Image = {
 }
 
 export type Material = {
-    _id: mongoose.Schema.Types.ObjectId,
+    _id?: mongoose.Schema.Types.ObjectId,
     container_number: string,
     gross_weight: number,
     net_weight: number,
@@ -49,7 +49,7 @@ export type Material = {
 }
 
 export type Docs = {
-    _id: mongoose.Schema.Types.ObjectId
+    _id?: mongoose.Schema.Types.ObjectId
     clearing_price: string,
     created_at: string,
     doc_name: string,
@@ -62,7 +62,7 @@ export type Docs = {
 }
 
 export type Orders = {
-    _id: mongoose.Schema.Types.ObjectId,
+    _id?: mongoose.Schema.Types.ObjectId,
     docs: Docs[],
     materials: Material[],
     bill_of_lading_number: string,
