@@ -1,11 +1,12 @@
-import CustomerForm from "./components/customers/CustomerForm";
+
+import Dashboard from "./pages/Dashboard";
 
 export default function App() {
 
   return (
 
     <>
-      <CustomerForm />
+      <Dashboard />
     </>
   );
 }
