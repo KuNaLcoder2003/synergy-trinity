@@ -2,7 +2,7 @@ import type React from "react";
 import { DropDowns, InputFeilds, SubmitButton, TextArea } from "../../utils/form";
 import { useState } from "react";
 import useCountries from "../../hooks/useCountries";
-import { Loader } from "lucide-react";
+import { Loader, X } from "lucide-react";
 
 
 type Customer = {
@@ -19,7 +19,7 @@ type Customer = {
     pan_no: string,
     gst_no: string,
 }
-const CustomerForm: React.FC = () => {
+const CustomerForm: React.FC<{ onClose: React.Dispatch<React.SetStateAction<boolean>> }> = ({ onClose }) => {
     const [customerDetails, setCustomerDetails] = useState<Customer>({
         first_name: "",
         last_name: "",
@@ -47,7 +47,10 @@ const CustomerForm: React.FC = () => {
                         color: "oklch(69.6% 0.17 162.48)"
                     }} />
                 </div> : <div className="w-full max-h-[85vh] overflow-y-auto p-6 sm:p-8 bg-white/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200">
-                    <h2 className="text-2xl sm:text-3xl font-semibold mb-6 text-gray-800">New Customer</h2>
+                    <div className="w-full flex justify-between items-center">
+                        <h2 className="text-2xl sm:text-3xl font-semibold mb-6 text-gray-800">New Customer</h2>
+                        <X onClick={() => onClose(false)} color="red" className="cursor-pointer" size={15} />
+                    </div>
                     <form className="w-full grid grid-cols-1 md:grid-cols-2 gap-5">
 
                         <InputFeilds placeholder="Enter First name" label="First Name" type="text" value={customerDetails.first_name} onChange={(e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>) => {
