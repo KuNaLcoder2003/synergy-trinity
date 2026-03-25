@@ -46,11 +46,11 @@ export const SubmitButton: React.FC<{ onClick: () => Promise<void>, type: "Custo
 
         <button
             onClick={onClick}
-            className="bg-white text-center w-48 mx-auto rounded-2xl h-14 relative text-black text-xl font-semibold group"
+            className="bg-white text-center w-52 mx-auto rounded-2xl h-14 relative text-black text-xl font-semibold group"
             type="submit"
         >
             <div
-                className="bg-green-400 rounded-xl h-12 w-1/4 flex items-center justify-center absolute left-1 top-[4px] group-hover:w-[189px] z-10 duration-500 cursor-pointer"
+                className="bg-green-400 rounded-xl h-12 w-1/5 flex items-center justify-center absolute left-1 top-[4px] group-hover:w-[200px] z-10 duration-500 cursor-pointer"
             >
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
