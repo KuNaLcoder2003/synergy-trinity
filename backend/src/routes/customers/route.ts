@@ -25,7 +25,7 @@ customerRouter.post('/newCustomer', async (req: express.Request, res: express.Re
                 }
             ]
         })
-        if (!customer) {
+        if (customer) {
             res.status(400).json({
                 message: "Cutomer already exists",
                 valid: false
@@ -50,6 +50,28 @@ customerRouter.post('/newCustomer', async (req: express.Request, res: express.Re
         res.status(500).json({
             message: "Something went wrong",
             valid: false
+        })
+    }
+})
+
+customerRouter.get("/all", async (req: express.Request, res: express.Response) => {
+    try {
+        const customers = await Customer.find({})
+        if (!customers || customers == null) {
+            res.status(403).json({
+                message: "Unable to fetch customers",
+                valid: false
+            })
+            return
+        }
+        res.status(200).json({
+            customers,
+            valid: true
+        })
+    } catch (error) {
+        res.status(500).json({
+            message: "Something went wrong",
+            valid: true
         })
     }
 })
